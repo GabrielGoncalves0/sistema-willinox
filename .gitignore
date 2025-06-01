@@ -1,0 +1,21 @@
+# Dependências
+node_modules/
+
+# Build
+dist/
+
+# Variáveis de ambiente
+.env
+.env.development
+.env.production
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Banco de dados local (se não for versionado)
+*.db
+
+# Outros arquivos temporários
+*.log

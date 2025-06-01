@@ -1,0 +1,11 @@
+styles/globals.css
+:root {
+    --toast-width: 400px;
+    --toast-font-size: 1.1rem;
+}
+
+.sonner-toast {
+    width: var(--toast-width) !important;
+    font-size: var(--toast-font-size) !important;
+    margin: 10px !important;
+}
