@@ -161,7 +161,7 @@ export default function DashboardLayout({
       <Box sx={{ p: 3, display: 'flex', alignItems: 'center', gap: 2 }}>
         <LayoutDashboard size={32} color={theme.palette.primary.main} />
         <Typography variant="h6" color="text.primary" sx={{ fontWeight: 600 }}>
-          WILLINOX
+          Teste mudanças no github
         </Typography>
       </Box>
       <List sx={{ px: 2 }}>
