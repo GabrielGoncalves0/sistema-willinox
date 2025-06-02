@@ -38,7 +38,7 @@ jobs:
                 key: ${{ secrets.key }}
                 port: 22
                  #tempo de deploy
-                timeout: 3600
+                timeout: "3600s"
                 #server é nome da nossa aplicação no PM2
                 script: |
                       cd /home/ubuntu/deploy-automatico
