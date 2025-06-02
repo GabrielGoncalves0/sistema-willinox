@@ -4,9 +4,10 @@
   "private": true,
   "scripts": {
     "dev": "copy .env.development .env /Y && next dev",
-    "build": "copy .env.production .env /Y && next build",
+    "build": "cp .env.production .env && next build",
+    "build:dev": "copy .env.production .env /Y && next build",
     "start": "next start",
-    "start:prod": "copy .env.production .env /Y && next start",
+    "start:prod": "cp .env.production .env && next start",
     "lint": "next lint"
   },
   "dependencies": {

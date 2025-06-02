@@ -111,8 +111,8 @@ NODE_ENV=production npm start
 npm install -g pm2
 
 # Iniciar a aplicação
-pm2 start dist/server.js --name "willinox-api"
-
+pm2 start dist/server.js --name "api"
+pm2 start /usr/bin/bash --name client -- -c "npm run start:prod"
 # Configurar para iniciar automaticamente
 pm2 startup
 pm2 save
