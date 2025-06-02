@@ -32,7 +32,8 @@ jobs:
           timeout: "13600s"
           command_timeout: "13600s"
           script: |
-            cd client
+            cd /home/ubuntu/deploy-automatico/client
+
             npm install
             npm run build
 
