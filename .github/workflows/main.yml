@@ -42,4 +42,4 @@ jobs:
 
             cd ..
             pm2 restart client
-            pm2 restart server
+            pm2 restart api
