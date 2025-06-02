@@ -134,7 +134,7 @@ export default function DashboardLayout({
     } finally {
       deleteCookie('token', {
         path: '/',
-        domain: process.env.NODE_ENV === 'production' ? '.140.238.168.227' : undefined,
+        domain: process.env.NODE_ENV === 'production' ? '.137.131.134.182' : undefined,
         //secure: process.env.NODE_ENV === 'production',
         secure: false,
       });

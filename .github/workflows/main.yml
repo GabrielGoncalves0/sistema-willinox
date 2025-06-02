@@ -29,11 +29,12 @@ jobs:
           username: ubuntu
           key: ${{ secrets.key }}
           port: 22
-          timeout: "13600s"
-          command_timeout: "13600s"
           script: |
-            cd /home/ubuntu/deploy-automatico/client
+            cd /home/ubuntu/deploy-automatico
+            # npm install
+            # npm run build
 
+            # cd client
             npm install
             npm run build
 
