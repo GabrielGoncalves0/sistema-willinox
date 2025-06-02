@@ -1,0 +1,207 @@
+CREATE DATABASE IF NOT EXISTS willinox;
+USE willinox;
+
+CREATE TABLE IF NOT EXISTS `tb_materiaPrima` (
+  `matpri_id` INT NOT NULL AUTO_INCREMENT,
+  `matpri_nome` VARCHAR(100) NOT NULL,
+  `matpri_descricao` VARCHAR(100),
+  `matpri_qtd_estoque` INT NOT NULL,
+  `matpri_unidade_medida` VARCHAR(20) NOT NULL,
+  `matpri_preco` DECIMAL(10,2) NOT NULL,
+  `matpri_codigo` VARCHAR(45) NOT NULL,
+  `ativo` TINYINT(1) NOT NULL DEFAULT 1,
+  PRIMARY KEY (`matpri_id`)
+) ENGINE = InnoDB;
+
+CREATE TABLE IF NOT EXISTS `tb_pessoa` (
+  `pes_id` INT NOT NULL AUTO_INCREMENT,
+  `pes_nome` VARCHAR(45) NOT NULL,
+  `pes_endereco` VARCHAR(45) NOT NULL,
+  `pes_telefone` VARCHAR(45) NOT NULL,
+  `pes_email` VARCHAR(45) NOT NULL,
+  `pes_tipo` ENUM('fisica', 'juridica') NOT NULL,
+  `ativo` TINYINT(1) NOT NULL DEFAULT 1,
+  PRIMARY KEY (`pes_id`)
+) ENGINE = InnoDB;
+
+CREATE TABLE IF NOT EXISTS `tb_pedido` (
+  `ped_id` INT NOT NULL AUTO_INCREMENT,
+  `ped_data` DATE NOT NULL,
+  `ped_data_fim` DATE NULL,
+  `ped_status` ENUM('pendente', 'processado', 'concluido', 'cancelado') NOT NULL,
+  `pes_id` INT NOT NULL,
+  `ped_valor_entrada` DECIMAL(10,2) DEFAULT 0,
+  PRIMARY KEY (`ped_id`),
+  FOREIGN KEY (`pes_id`) REFERENCES `tb_pessoa` (`pes_id`)
+) ENGINE = InnoDB;
+
+CREATE TABLE IF NOT EXISTS `tb_modelo` (
+  `mod_id` INT NOT NULL AUTO_INCREMENT,
+  `mod_nome` VARCHAR(45) NOT NULL,
+  `mod_descricao` VARCHAR(45),
+  `ativo` TINYINT(1) NOT NULL DEFAULT 1,
+  PRIMARY KEY (`mod_id`)
+) ENGINE = InnoDB;
+
+CREATE TABLE IF NOT EXISTS `tb_produto` (
+  `pro_id` INT NOT NULL AUTO_INCREMENT,
+  `pro_nome` VARCHAR(100) NOT NULL,
+  `pro_descricao` VARCHAR(100),
+  `pro_preco` DECIMAL(10,2) NOT NULL,
+  `pro_qtd_estoque` INT NOT NULL,
+  `pro_codigo` VARCHAR(45) NOT NULL,
+  `mod_id` INT NOT NULL,
+  `ativo` TINYINT(1) NOT NULL DEFAULT 1,
+  PRIMARY KEY (`pro_id`),
+  FOREIGN KEY (`mod_id`) REFERENCES `tb_modelo` (`mod_id`)
+) ENGINE = InnoDB;
+
+CREATE TABLE IF NOT EXISTS `tb_pedido_materiaPrima` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `ped_id` INT NOT NULL,
+  `matpri_id` INT NOT NULL,
+  `qtd_materia_prima` INT NOT NULL,
+  `mat_preco` DECIMAL(10,2) NOT NULL,
+  PRIMARY KEY (`id`),
+  FOREIGN KEY (`ped_id`) REFERENCES `tb_pedido` (`ped_id`),
+  FOREIGN KEY (`matpri_id`) REFERENCES `tb_materiaPrima` (`matpri_id`)
+) ENGINE = InnoDB;
+
+CREATE TABLE IF NOT EXISTS `tb_pedido_produto` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `ped_id` INT NOT NULL,
+  `pro_id` INT NOT NULL,
+  `qtd_produto` INT NOT NULL,
+  `pro_preco` DECIMAL(10,2) NOT NULL,
+  PRIMARY KEY (`id`),
+  FOREIGN KEY (`ped_id`) REFERENCES `tb_pedido` (`ped_id`),
+  FOREIGN KEY (`pro_id`) REFERENCES `tb_produto` (`pro_id`)
+) ENGINE = InnoDB;
+
+CREATE TABLE IF NOT EXISTS `tb_produto_materiaPrima` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `pro_id` INT NOT NULL,
+  `matpri_id` INT NOT NULL,
+  `qtd_materia_prima` INT NOT NULL,
+  PRIMARY KEY (`id`),
+  FOREIGN KEY (`pro_id`) REFERENCES `tb_produto` (`pro_id`),
+  FOREIGN KEY (`matpri_id`) REFERENCES `tb_materiaPrima` (`matpri_id`)
+) ENGINE = InnoDB;
+
+CREATE TABLE IF NOT EXISTS `tb_juridica` (
+  `jur_id` INT NOT NULL AUTO_INCREMENT,
+  `jur_cnpj` VARCHAR(45) NOT NULL,
+  `jur_tipo` ENUM('fornecedor', 'cliente') NOT NULL,
+  `pes_id` INT NOT NULL,
+  `ativo` TINYINT(1) NOT NULL DEFAULT 1,
+  PRIMARY KEY (`jur_id`, `pes_id`),
+  FOREIGN KEY (`pes_id`) REFERENCES `tb_pessoa` (`pes_id`)
+) ENGINE = InnoDB;
+
+CREATE TABLE IF NOT EXISTS `tb_compra` (
+  `com_id` INT NOT NULL AUTO_INCREMENT,
+  `com_data` DATE NOT NULL,
+  `com_status` ENUM('pendente', 'processando', 'concluido', 'cancelado') NOT NULL,
+  `com_valor_total` DECIMAL(10,2) NOT NULL,
+  `jur_id` INT NOT NULL,
+  PRIMARY KEY (`com_id`),
+  FOREIGN KEY (`jur_id`) REFERENCES `tb_juridica` (`jur_id`)
+) ENGINE = InnoDB;
+
+CREATE TABLE IF NOT EXISTS `tb_itens_compra` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `com_id` INT NOT NULL,
+  `matpri_id` INT NOT NULL,
+  `qtd_materia_prima` INT NOT NULL,
+  `mat_preco` DECIMAL(10,2) NOT NULL,
+  PRIMARY KEY (`id`),
+  FOREIGN KEY (`com_id`) REFERENCES `tb_compra` (`com_id`),
+  FOREIGN KEY (`matpri_id`) REFERENCES `tb_materiaPrima` (`matpri_id`)
+) ENGINE = InnoDB;
+
+CREATE TABLE IF NOT EXISTS `tb_fisica` (
+  `fis_id` INT NOT NULL AUTO_INCREMENT,
+  `fis_cpf` VARCHAR(45) NOT NULL,
+  `fis_data_nascimento` DATE NOT NULL,
+  `fis_tipo` ENUM('cliente', 'funcionario') NOT NULL,
+  `fun_login` VARCHAR(45) NULL,
+  `fun_senha` VARCHAR(45) NULL,
+  `pes_id` INT NOT NULL,
+  `ativo` TINYINT(1) NOT NULL DEFAULT 1,
+  PRIMARY KEY (`fis_id`, `pes_id`),
+  FOREIGN KEY (`pes_id`) REFERENCES `tb_pessoa` (`pes_id`)
+) ENGINE = InnoDB;
+
+CREATE TABLE IF NOT EXISTS `tb_producao` (
+  `producao_id` INT NOT NULL AUTO_INCREMENT,
+  `pro_data_inicio` DATE NOT NULL,
+  `pro_data_fim` DATE NULL,
+  `pro_status` ENUM('pendente', 'em_andamento', 'concluido', 'cancelado') NOT NULL,
+  `pro_quantidade` INT NOT NULL DEFAULT 0,
+  `pro_id` INT NOT NULL,
+  `fis_id` INT NOT NULL,
+  PRIMARY KEY (`producao_id`),
+  FOREIGN KEY (`pro_id`) REFERENCES `tb_produto` (`pro_id`),
+  FOREIGN KEY (`fis_id`) REFERENCES `tb_fisica` (`fis_id`)
+) ENGINE = InnoDB;
+
+CREATE TABLE IF NOT EXISTS `tb_itens_producao` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `matpri_id` INT NOT NULL,
+  `producao_id` INT NOT NULL,
+  `pro_mat_quantidade` INT NOT NULL,
+  PRIMARY KEY (`id`),
+  FOREIGN KEY (`matpri_id`) REFERENCES `tb_materiaPrima` (`matpri_id`),
+  FOREIGN KEY (`producao_id`) REFERENCES `tb_producao` (`producao_id`)
+) ENGINE = InnoDB;
+
+INSERT INTO `tb_pessoa` (`pes_id`, `pes_nome`, `pes_endereco`, `pes_telefone`, `pes_email`, `pes_tipo`, `ativo`)
+VALUES (1, 'Administrador', 'Rua Exemplo, 123', '1234-5678', 'admin@exemplo.com', 'fisica', 1);
+
+INSERT INTO `tb_fisica` (`fis_id`, `fis_cpf`, `fis_data_nascimento`, `fis_tipo`, `fun_login`, `fun_senha`, `pes_id`, `ativo`)
+VALUES (1, '123.456.789-00', '1980-01-01', 'funcionario', 'admin', '12345', 1, 1);
+
+-- Funcionário 1
+INSERT INTO tb_pessoa (pes_nome, pes_endereco, pes_telefone, pes_email, pes_tipo, ativo)
+VALUES ('João Silva', 'Av. Inox, 1000', '1899-1234', 'joao@inox.com', 'fisica', 1);
+INSERT INTO tb_fisica (fis_cpf, fis_data_nascimento, fis_tipo, fun_login, fun_senha, pes_id, ativo)
+VALUES ('111.222.333-44', '1990-05-20', 'funcionario', 'joao', 'senha123', LAST_INSERT_ID(), 1);
+
+-- Funcionário 2
+INSERT INTO tb_pessoa (pes_nome, pes_endereco, pes_telefone, pes_email, pes_tipo, ativo)
+VALUES ('Maria Souza', 'Rua do Aço, 321', '1899-5678', 'maria@inox.com', 'fisica', 1);
+INSERT INTO tb_fisica (fis_cpf, fis_data_nascimento, fis_tipo, fun_login, fun_senha, pes_id, ativo)
+VALUES ('555.666.777-88', '1985-11-15', 'funcionario', 'maria', 'senha456', LAST_INSERT_ID(), 1);
+
+-- Cliente físico
+INSERT INTO tb_pessoa (pes_nome, pes_endereco, pes_telefone, pes_email, pes_tipo, ativo)
+VALUES ('Carlos Mendes', 'Rua Cliente, 45', '1899-7890', 'carlos@email.com', 'fisica', 1);
+INSERT INTO tb_fisica (fis_cpf, fis_data_nascimento, fis_tipo, fun_login, fun_senha, pes_id, ativo)
+VALUES ('999.888.777-66', '1978-03-10', 'cliente', NULL, NULL, LAST_INSERT_ID(), 1);
+
+-- Fornecedor jurídico
+INSERT INTO tb_pessoa (pes_nome, pes_endereco, pes_telefone, pes_email, pes_tipo, ativo)
+VALUES ('Aço Forte Indústria', 'Rodovia do Aço, km 12', '1800-0000', 'contato@aco.com', 'juridica', 1);
+INSERT INTO tb_juridica (jur_cnpj, jur_tipo, pes_id, ativo)
+VALUES ('12.345.678/0001-90', 'fornecedor', LAST_INSERT_ID(), 1);
+
+-- Modelo
+INSERT INTO tb_modelo (mod_nome, mod_descricao, ativo)
+VALUES 
+('Corrimão Padrão', 'Corrimão simples em inox escovado', 1),
+('Coifa Industrial', 'Coifa de inox para cozinha industrial', 1),
+('Grade de Proteção', 'Grade inox sob medida para proteção', 1);
+
+-- Produto
+INSERT INTO tb_produto (pro_nome, pro_descricao, pro_preco, pro_qtd_estoque, pro_codigo, mod_id, ativo)
+VALUES 
+('Corrimão Inox 2m', 'Corrimão de inox 304 com 2 metros', 350.00, 10, 'P-1', 1, 1),
+('Coifa Inox Parede', 'Coifa de inox 90cm para parede', 800.00, 5, 'P-2', 2, 1),
+('Grade Inox Janela', 'Grade de proteção inox 1x1m', 250.00, 8, 'P-3', 3, 1);
+
+-- MateriaPrima
+INSERT INTO tb_materiaPrima (matpri_nome, matpri_descricao, matpri_qtd_estoque, matpri_unidade_medida, matpri_preco, matpri_codigo, ativo)
+VALUES 
+('Chapa Inox 304', 'Chapa de inox tipo 304 espessura 1mm', 50, 'un', 120.00, 'MP-1', 1),
+('Tubo Inox 1"', 'Tubo de inox redondo 1 polegada', 100, 'un', 30.00, 'MP-2', 1),
+('Parafuso Inox', 'Parafuso sextavado inox', 500, 'un', 0.50, 'MP-3', 1);
