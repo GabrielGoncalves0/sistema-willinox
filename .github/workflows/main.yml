@@ -37,6 +37,12 @@ jobs:
           script: |
             cd /home/ubuntu/sistema
             chmod +x scripts/post-deploy-backend.sh
+            DB_HOST="${{ secrets.DB_HOST }}" \
+            DB_DATABASE="${{ secrets.DB_DATABASE }}" \
+            DB_USER="${{ secrets.DB_USER }}" \
+            DB_PASSWORD="${{ secrets.DB_PASSWORD }}" \
+            CORS_ORIGIN="${{ secrets.CORS_ORIGIN }}" \
+            JWT_SECRET="${{ secrets.JWT_SECRET }}" \
             bash scripts/post-deploy-backend.sh
         env:
           DB_HOST: ${{ secrets.DB_HOST }}
