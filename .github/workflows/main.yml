@@ -22,6 +22,21 @@ jobs:
           private-ssh-key: ${{ secrets.key }}
           destination-path: /home/ubuntu/sistema/
 
+      - name: Pós-deploy backend - Garante .env
+        run: bash scripts/post-deploy-backend.sh
+        working-directory: /home/ubuntu/sistema
+        env:
+          DB_HOST: ${{ secrets.DB_HOST }}
+          DB_DATABASE: ${{ secrets.DB_DATABASE }}
+          DB_USER: ${{ secrets.DB_USER }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          CORS_ORIGIN: ${{ secrets.CORS_ORIGIN }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+
+      - name: Pós-deploy client - Garante .envs do client
+        run: bash scripts/post-deploy-client.sh
+        working-directory: /home/ubuntu/sistema
+
       - name: Aplicando as mudanças
         uses: appleboy/ssh-action@v1.0.3
         with:
