@@ -34,11 +34,17 @@ jobs:
           username: ubuntu
           key: ${{ secrets.key }}
           port: 22
-          envs: DB_HOST,DB_DATABASE,DB_USER,DB_PASSWORD,CORS_ORIGIN,JWT_SECRET
           script: |
             cd /home/ubuntu/sistema
             chmod +x scripts/post-deploy-backend.sh
             bash scripts/post-deploy-backend.sh
+        env:
+          DB_HOST: ${{ secrets.DB_HOST }}
+          DB_DATABASE: ${{ secrets.DB_DATABASE }}
+          DB_USER: ${{ secrets.DB_USER }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          CORS_ORIGIN: ${{ secrets.CORS_ORIGIN }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
 
       - name: Pós-deploy client - Garante .envs do client
         uses: appleboy/ssh-action@v1.0.3
