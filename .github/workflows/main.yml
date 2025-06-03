@@ -21,31 +21,11 @@ jobs:
           remote-user: ubuntu
           private-ssh-key: ${{ secrets.key }}
           destination-path: /home/ubuntu/sistema/
-
-      - name: Pós-deploy backend - Garante .env
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.host }}
-          username: ubuntu
-          key: ${{ secrets.key }}
-          port: 22
-          envs: DB_HOST,DB_DATABASE,DB_USER,DB_PASSWORD,CORS_ORIGIN,JWT_SECRET
-          script: |
-            cd /home/ubuntu/sistema
-            chmod +x scripts/post-deploy-backend.sh
-            bash scripts/post-deploy-backend.sh
-
-      - name: Pós-deploy client - Garante .envs do client
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.host }}
-          username: ubuntu
-          key: ${{ secrets.key }}
-          port: 22
-          script: |
-            cd /home/ubuntu/sistema
-            chmod +x scripts/post-deploy-client.sh
-            bash scripts/post-deploy-client.sh
+          exclude: |
+            .env
+            .env.production
+            client/.env
+            client/.env.production
 
       - name: Aplicando as mudanças
         uses: appleboy/ssh-action@v1.0.3
