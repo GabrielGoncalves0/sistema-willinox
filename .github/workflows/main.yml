@@ -32,6 +32,7 @@ jobs:
           envs: DB_HOST,DB_DATABASE,DB_USER,DB_PASSWORD,CORS_ORIGIN,JWT_SECRET
           script: |
             cd /home/ubuntu/sistema
+            chmod +x scripts/post-deploy-backend.sh
             bash scripts/post-deploy-backend.sh
 
       - name: Pós-deploy client - Garante .envs do client
@@ -43,6 +44,7 @@ jobs:
           port: 22
           script: |
             cd /home/ubuntu/sistema
+            chmod +x scripts/post-deploy-client.sh
             bash scripts/post-deploy-client.sh
 
       - name: Aplicando as mudanças
