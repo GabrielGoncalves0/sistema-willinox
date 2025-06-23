@@ -17,7 +17,7 @@ import { listarCliente } from '../constants';
 import { FormatDate } from '@/utils/formatDate';
 import { TablePagination } from '@/components/TablePagination';
 import { useState, ChangeEvent } from 'react';
-
+import CustomizedProgressBars from '@/components/ProgressLoading';
 
 interface ClientTableProps {
   clientes: listarCliente[];
@@ -74,10 +74,6 @@ export const ClienteTable = ({
     setPage(0);
   };
 
-  if (isLoading) {
-    return <Typography>Carregando clientes...</Typography>;
-  }
-
   return (
     <Box>
       <TableContainer component={Paper} sx={{ borderRadius: '8px 8px 0 0' }}>
@@ -94,66 +90,74 @@ export const ClienteTable = ({
           </TableRow>
         </TableHead>
         <TableBody>
-          {paginatedClients.length > 0 ? (
-            paginatedClients.map((client) => (
-              <TableRow
-                key={`${client.tipo}-${client.id}`}
-                sx={!client.ativo ? { backgroundColor: 'rgba(0, 0, 0, 0.04)' } : {}}
-              >
-                <TableCell>
-                  {client.pessoa?.nome || 'Nome não disponível'}
-                  {!client.ativo && (
-                    <Typography variant="caption" color="text.secondary" sx={{ ml: 1, fontStyle: 'italic' }}>
-                      (Inativo)
-                    </Typography>
-                  )}
-                </TableCell>
-                <TableCell>{client.pessoa?.endereco || 'Endereço não disponível'}</TableCell>
-                <TableCell>{client.pessoa?.telefone || 'Telefone não disponível'}</TableCell>
-                <TableCell>{client.pessoa?.email || 'Email não disponível'}</TableCell>
-                <TableCell>
-                  {client.tipo === 'fisica' ? client.cpf : client.cnpj}
-                </TableCell>
-                <TableCell>
-                  {client.tipo === 'fisica'
-                    ? FormatDate.date(client.dataNascimento)
-                    : '-'}
-                </TableCell>
-                <TableCell align="center">
-                  <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-                    <IconButton
-                      color="primary"
-                      onClick={() => onEdit(client)}
-                    >
-                      <Edit />
-                    </IconButton>
-                    {client.ativo ? (
-                      <IconButton
-                        color="error"
-                        onClick={() => onDelete(client)}
-                      >
-                        <Delete />
-                      </IconButton>
-                    ) : (
-                      <IconButton
-                        color="success"
-                        onClick={() => onRestore && onRestore(client)}
-                        disabled={!onRestore}
-                        title={!onRestore ? "Função de restauração não disponível" : "Restaurar cliente"}
-                      >
-                        <Restore />
-                      </IconButton>
-                    )}
-                  </Box>
-                </TableCell>
-              </TableRow>
-            ))
-          ) : (
+          {isLoading ? (
             <TableRow>
               <TableCell colSpan={7} align="center">
-                Nenhum cliente encontrado
+                <CustomizedProgressBars />
               </TableCell>
             </TableRow>
+          ) : (
+            paginatedClients.length > 0 ? (
+              paginatedClients.map((client) => (
+                <TableRow
+                  key={`${client.tipo}-${client.id}`}
+                  sx={!client.ativo ? { backgroundColor: 'rgba(0, 0, 0, 0.04)' } : {}}
+                >
+                  <TableCell>
+                    {client.pessoa?.nome || 'Nome não disponível'}
+                    {!client.ativo && (
+                      <Typography variant="caption" color="text.secondary" sx={{ ml: 1, fontStyle: 'italic' }}>
+                        (Inativo)
+                      </Typography>
+                    )}
+                  </TableCell>
+                  <TableCell>{client.pessoa?.endereco || 'Endereço não disponível'}</TableCell>
+                  <TableCell>{client.pessoa?.telefone || 'Telefone não disponível'}</TableCell>
+                  <TableCell>{client.pessoa?.email || 'Email não disponível'}</TableCell>
+                  <TableCell>
+                    {client.tipo === 'fisica' ? client.cpf : client.cnpj}
+                  </TableCell>
+                  <TableCell>
+                    {client.tipo === 'fisica'
+                      ? FormatDate.date(client.dataNascimento)
+                      : '-'}
+                  </TableCell>
+                  <TableCell align="center">
+                    <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                      <IconButton
+                        color="primary"
+                        onClick={() => onEdit(client)}
+                      >
+                        <Edit />
+                      </IconButton>
+                      {client.ativo ? (
+                        <IconButton
+                          color="error"
+                          onClick={() => onDelete(client)}
+                        >
+                          <Delete />
+                        </IconButton>
+                      ) : (
+                        <IconButton
+                          color="success"
+                          onClick={() => onRestore && onRestore(client)}
+                          disabled={!onRestore}
+                          title={!onRestore ? "Função de restauração não disponível" : "Restaurar cliente"}
+                        >
+                          <Restore />
+                        </IconButton>
+                      )}
+                    </Box>
+                  </TableCell>
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={7} align="center">
+                  Nenhum cliente encontrado
+                </TableCell>
+              </TableRow>
+            )
           )}
         </TableBody>
       </Table>

@@ -25,6 +25,7 @@ import { FuncionarioForm } from './components/FuncionarioForm';
 import DeleteFuncionarioDialog from './components/DeleteFuncionarioDialog';
 import FuncionarioTable from './components/FuncionarioTable';
 import { CreateFuncionario, listarFuncionario } from './constants';
+import CustomizedProgressBars from '@/components/ProgressLoading';
 
 export default function FuncionariosPage() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -149,9 +150,6 @@ export default function FuncionariosPage() {
         />
       </Box>
 
-      {isLoading ? (
-        <CircularProgress />
-      ) : (
         <FuncionarioTable
           funcionarios={funcionarios}
           onEdit={(funcionario: listarFuncionario | null) => formModal.openForm(funcionario || undefined)}
@@ -161,7 +159,7 @@ export default function FuncionariosPage() {
           searchTerm={searchTerm}
           showInativos={showInativos}
         />
-      )}
+
 
       <FuncionarioForm
         open={formModal.isOpen}

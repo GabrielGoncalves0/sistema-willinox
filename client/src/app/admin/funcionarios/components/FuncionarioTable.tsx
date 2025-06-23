@@ -17,7 +17,7 @@ import { Edit, Delete, Restore } from '@mui/icons-material';
 import { listarFuncionario } from '../constants';
 import { TablePagination } from '@/components/TablePagination';
 import { useState, ChangeEvent } from 'react';
-
+import CustomizedProgressBars from '@/components/ProgressLoading';
 
 interface FuncionarioListProps {
   funcionarios: listarFuncionario[];
@@ -73,10 +73,6 @@ export default function FuncionarioTable({
     setPage(0);
   };
 
-  if (isLoading) {
-    return <Typography>Carregando funcionários...</Typography>;
-  }
-
   return (
     <Box>
       <TableContainer component={Paper} sx={{ borderRadius: '8px 8px 0 0' }}>
@@ -92,77 +88,85 @@ export default function FuncionarioTable({
           </TableRow>
         </TableHead>
         <TableBody>
-          {paginatedFuncionarios.length > 0 ? (
-            paginatedFuncionarios.map((funcionario) => (
-              <TableRow
-                key={funcionario.id}
-                sx={!funcionario.ativo ? { backgroundColor: 'rgba(0, 0, 0, 0.04)' } : {}}
-              >
-                <TableCell>
-                  {funcionario.pessoa.nome}
-                  {!funcionario.ativo && (
-                    <Typography variant="caption" color="text.secondary" sx={{ ml: 1, fontStyle: 'italic' }}>
-                      (Inativo)
-                    </Typography>
-                  )}
-                </TableCell>
-                <TableCell>{funcionario.cpf}</TableCell>
-                <TableCell>{funcionario.pessoa.email}</TableCell>
-                <TableCell>{funcionario.pessoa.telefone}</TableCell>
-                <TableCell>
-                  {funcionario.login ? (
-                    <Chip
-                      label="Sim"
-                      sx={{
-                        backgroundColor: '#06c14a',
-                        color: 'white',
-                      }}
-                    />
-                  ) : (
-                    <Chip
-                      label="Não"
-                      sx={{
-                        backgroundColor: '#9e9e9e',
-                        color: 'white',
-                      }}
-                    />
-                  )}
-                </TableCell>
-                <TableCell align="center">
-                  <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-                    <IconButton
-                      color="primary"
-                      onClick={() => onEdit(funcionario)}
-                    >
-                      <Edit />
-                    </IconButton>
-                    {funcionario.ativo ? (
-                      <IconButton
-                        color="error"
-                        onClick={() => onDelete(funcionario)}
-                      >
-                        <Delete />
-                      </IconButton>
-                    ) : (
-                      <IconButton
-                        color="success"
-                        onClick={() => onRestore && onRestore(funcionario)}
-                        disabled={!onRestore}
-                        title={!onRestore ? "Função de restauração não disponível" : "Restaurar funcionário"}
-                      >
-                        <Restore />
-                      </IconButton>
-                    )}
-                  </Box>
-                </TableCell>
-              </TableRow>
-            ))
-          ) : (
+          {isLoading ? (
             <TableRow>
               <TableCell colSpan={6} align="center">
-                Nenhum funcionário encontrado
+                <CustomizedProgressBars />
               </TableCell>
             </TableRow>
+          ) : (
+            paginatedFuncionarios.length > 0 ? (
+              paginatedFuncionarios.map((funcionario) => (
+                <TableRow
+                  key={funcionario.id}
+                  sx={!funcionario.ativo ? { backgroundColor: 'rgba(0, 0, 0, 0.04)' } : {}}
+                >
+                  <TableCell>
+                    {funcionario.pessoa.nome}
+                    {!funcionario.ativo && (
+                      <Typography variant="caption" color="text.secondary" sx={{ ml: 1, fontStyle: 'italic' }}>
+                        (Inativo)
+                      </Typography>
+                    )}
+                  </TableCell>
+                  <TableCell>{funcionario.cpf}</TableCell>
+                  <TableCell>{funcionario.pessoa.email}</TableCell>
+                  <TableCell>{funcionario.pessoa.telefone}</TableCell>
+                  <TableCell>
+                    {funcionario.login ? (
+                      <Chip
+                        label="Sim"
+                        sx={{
+                          backgroundColor: '#06c14a',
+                          color: 'white',
+                        }}
+                      />
+                    ) : (
+                      <Chip
+                        label="Não"
+                        sx={{
+                          backgroundColor: '#9e9e9e',
+                          color: 'white',
+                        }}
+                      />
+                    )}
+                  </TableCell>
+                  <TableCell align="center">
+                    <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                      <IconButton
+                        color="primary"
+                        onClick={() => onEdit(funcionario)}
+                      >
+                        <Edit />
+                      </IconButton>
+                      {funcionario.ativo ? (
+                        <IconButton
+                          color="error"
+                          onClick={() => onDelete(funcionario)}
+                        >
+                          <Delete />
+                        </IconButton>
+                      ) : (
+                        <IconButton
+                          color="success"
+                          onClick={() => onRestore && onRestore(funcionario)}
+                          disabled={!onRestore}
+                          title={!onRestore ? "Função de restauração não disponível" : "Restaurar funcionário"}
+                        >
+                          <Restore />
+                        </IconButton>
+                      )}
+                    </Box>
+                  </TableCell>
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={6} align="center">
+                  Nenhum funcionário encontrado
+                </TableCell>
+              </TableRow>
+            )
           )}
         </TableBody>
       </Table>

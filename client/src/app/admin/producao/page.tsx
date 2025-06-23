@@ -162,11 +162,6 @@ export default function ProducaoPage() {
         </Grid>
       </Grid>
 
-      {isLoading ? (
-        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
-          <CircularProgress />
-        </Box>
-      ) : (
         <ProducaoTable
           producoes={filteredProducoes}
           onEdit={(producao: ListarProducao) => formModal.openForm(producao)}
@@ -176,7 +171,6 @@ export default function ProducaoPage() {
           isLoading={isLoading}
           searchTerm={searchTerm}
         />
-      )}
 
       <ProducaoForm
         open={formModal.isOpen}

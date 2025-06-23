@@ -153,22 +153,16 @@ export default function ComprasPage() {
           </Grid>
         </Grid>
 
-        {isLoading ? (
-          <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}>
-            <CircularProgress />
-          </Box>
-        ) : (
-          <CompraTable
-            compras={compras}
-            onEdit={(compra?: CompraDetalhada) => formModal.openForm(compra)}
-            onDelete={tableActions.openDeleteDialog}
-            onFinalize={handleFinalize}
-            onCancel={handleCancel}
-            onViewDetails={handleViewDetails}
-            isLoading={isLoading}
-            searchTerm={searchTerm}
-          />
-        )}
+        <CompraTable
+          compras={compras}
+          onEdit={(compra?: CompraDetalhada) => formModal.openForm(compra)}
+          onDelete={tableActions.openDeleteDialog}
+          onFinalize={handleFinalize}
+          onCancel={handleCancel}
+          onViewDetails={handleViewDetails}
+          isLoading={isLoading}
+          searchTerm={searchTerm}
+        />
       </Box>
 
       <CompraForm

@@ -16,7 +16,7 @@ import { Edit, Delete, Restore } from '@mui/icons-material';
 import { Modelo } from '../constants';
 import { TablePagination } from '@/components/TablePagination';
 import { useState, ChangeEvent } from 'react';
-
+import CustomizedProgressBars from '@/components/ProgressLoading';
 
 interface ModelListProps {
   models: Modelo[];
@@ -61,10 +61,6 @@ export default function ModelTable({ models, onEdit, onDelete, onRestore, isLoad
     setPage(0);
   };
 
-  if (isLoading) {
-    return <Typography>Carregando modelos...</Typography>;
-  }
-
   return (
     <Box>
       <TableContainer component={Paper} sx={{ borderRadius: '8px 8px 0 0' }}>
@@ -78,56 +74,64 @@ export default function ModelTable({ models, onEdit, onDelete, onRestore, isLoad
           </TableRow>
         </TableHead>
         <TableBody>
-          {paginatedModels.length > 0 ? (
-            paginatedModels.map((model) => (
-              <TableRow
-                key={model.id}
-                sx={!model.ativo ? { backgroundColor: 'rgba(0, 0, 0, 0.04)' } : {}}
-              >
-                <TableCell>
-                  {model.nome}
-                  {!model.ativo && (
-                    <Typography variant="caption" color="text.secondary" sx={{ ml: 1, fontStyle: 'italic' }}>
-                      (Inativo)
-                    </Typography>
-                  )}
-                </TableCell>
-                <TableCell>{model.descricao}</TableCell>
-                <TableCell></TableCell>
-                <TableCell align="center">
-                  <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-                    <IconButton
-                      color="primary"
-                      onClick={() => onEdit(model)}
-                    >
-                      <Edit />
-                    </IconButton>
-                    {model.ativo ? (
-                      <IconButton
-                        color="error"
-                        onClick={() => onDelete(model)}
-                      >
-                        <Delete />
-                      </IconButton>
-                    ) : (
-                      <IconButton
-                        color="success"
-                        onClick={() => onRestore && onRestore(model)}
-                        disabled={!onRestore}
-                      >
-                        <Restore />
-                      </IconButton>
-                    )}
-                  </Box>
-                </TableCell>
-              </TableRow>
-            ))
-          ) : (
+          {isLoading ? (
             <TableRow>
               <TableCell colSpan={4} align="center">
-                Nenhum modelo encontrado
+                <CustomizedProgressBars />
               </TableCell>
             </TableRow>
+          ) : (
+            paginatedModels.length > 0 ? (
+              paginatedModels.map((model) => (
+                <TableRow
+                  key={model.id}
+                  sx={!model.ativo ? { backgroundColor: 'rgba(0, 0, 0, 0.04)' } : {}}
+                >
+                  <TableCell>
+                    {model.nome}
+                    {!model.ativo && (
+                      <Typography variant="caption" color="text.secondary" sx={{ ml: 1, fontStyle: 'italic' }}>
+                        (Inativo)
+                      </Typography>
+                    )}
+                  </TableCell>
+                  <TableCell>{model.descricao}</TableCell>
+                  <TableCell></TableCell>
+                  <TableCell align="center">
+                    <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                      <IconButton
+                        color="primary"
+                        onClick={() => onEdit(model)}
+                      >
+                        <Edit />
+                      </IconButton>
+                      {model.ativo ? (
+                        <IconButton
+                          color="error"
+                          onClick={() => onDelete(model)}
+                        >
+                          <Delete />
+                        </IconButton>
+                      ) : (
+                        <IconButton
+                          color="success"
+                          onClick={() => onRestore && onRestore(model)}
+                          disabled={!onRestore}
+                        >
+                          <Restore />
+                        </IconButton>
+                      )}
+                    </Box>
+                  </TableCell>
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={4} align="center">
+                  Nenhum modelo encontrado
+                </TableCell>
+              </TableRow>
+            )
           )}
         </TableBody>
       </Table>

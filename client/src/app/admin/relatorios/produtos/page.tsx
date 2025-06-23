@@ -29,13 +29,13 @@ import { useProducts } from '@/hooks/useProduto';
 import { useModelos } from '@/hooks/useModelo';
 import { useFilters } from '@/hooks/common/useFilters';
 import { usePagination } from '@/hooks/common/usePagination';
+import CustomizedProgressBars from '@/components/ProgressLoading';
 
 import {
   ProdutoReportFilters,
   ProdutoReport,
   ProdutoPorModelo,
   produtoReportFilterInitialValues,
-  produtoReportFilterSchema,
 } from './schema';
 import {
   exportarProdutosExcel,
@@ -397,82 +397,78 @@ export default function RelatorioProdutosPage() {
         </Box>
       </Paper>
 
-
-
-      {isLoading ? (
-        <Box sx={{ display: 'flex', justifyContent: 'center', my: 4 }}>
-          <CircularProgress />
-        </Box>
-      ) : (
-        <>
-          <Box>
-            <TableContainer component={Paper} sx={{ borderRadius: '8px 8px 0 0' }}>
-              <Table>
-                <TableHead>
-                  <TableRow>
-                    <TableCell>Código</TableCell>
-                    <TableCell>Nome</TableCell>
-                    <TableCell>Modelo</TableCell>
-                    <TableCell align="right">Preço</TableCell>
-                    <TableCell align="right">Estoque</TableCell>
-                    <TableCell align="right">Valor em Estoque</TableCell>
-                    <TableCell>Status</TableCell>
-                    <TableCell align="center">Ações</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {produtosFiltrados.length === 0 ? (
-                    <TableRow>
-                      <TableCell colSpan={8} align="center" sx={{ py: 3 }}>
-                        Nenhum produto encontrado
+      <Box>
+        <TableContainer component={Paper} sx={{ borderRadius: '8px 8px 0 0' }}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>Código</TableCell>
+                <TableCell>Nome</TableCell>
+                <TableCell>Modelo</TableCell>
+                <TableCell align="right">Preço</TableCell>
+                <TableCell align="right">Estoque</TableCell>
+                <TableCell align="right">Valor em Estoque</TableCell>
+                <TableCell>Status</TableCell>
+                <TableCell align="center">Ações</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {isLoading || isLoadingProdutos || isLoadingModelos ? (
+                <TableRow>
+                  <TableCell colSpan={8} align="center">
+                    <CustomizedProgressBars />
+                  </TableCell>
+                </TableRow>
+              ) : produtosFiltrados.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={8} align="center" sx={{ py: 3 }}>
+                    Nenhum produto encontrado
+                  </TableCell>
+                </TableRow>
+              ) : (
+                produtosFiltrados
+                  .slice(pagination.page * pagination.rowsPerPage, pagination.page * pagination.rowsPerPage + pagination.rowsPerPage)
+                  .map((produto) => (
+                    <TableRow key={produto.id}>
+                      <TableCell>{produto.codigo}</TableCell>
+                      <TableCell>{produto.nome}</TableCell>
+                      <TableCell>{produto.modelo.nome}</TableCell>
+                      <TableCell align="right">{formatarValor(produto.preco)}</TableCell>
+                      <TableCell align="right">{produto.qtdEstoque}</TableCell>
+                      <TableCell align="right">{formatarValor(produto.preco * produto.qtdEstoque)}</TableCell>
+                      <TableCell>
+                        <Chip
+                          label={produto.ativo ? 'Ativo' : 'Inativo'}
+                          color={produto.ativo ? 'success' : 'error'}
+                          size="small"
+                          sx={{ fontWeight: 'medium' }}
+                        />
+                      </TableCell>
+                      <TableCell align="center">
+                        <Button
+                          variant="outlined"
+                          size="small"
+                          onClick={() => handleAbrirDetalhes(produto)}
+                        >
+                          Detalhes
+                        </Button>
                       </TableCell>
                     </TableRow>
-                  ) : (
-                    produtosFiltrados
-                      .slice(pagination.page * pagination.rowsPerPage, pagination.page * pagination.rowsPerPage + pagination.rowsPerPage)
-                      .map((produto) => (
-                        <TableRow key={produto.id}>
-                          <TableCell>{produto.codigo}</TableCell>
-                          <TableCell>{produto.nome}</TableCell>
-                          <TableCell>{produto.modelo.nome}</TableCell>
-                          <TableCell align="right">{formatarValor(produto.preco)}</TableCell>
-                          <TableCell align="right">{produto.qtdEstoque}</TableCell>
-                          <TableCell align="right">{formatarValor(produto.preco * produto.qtdEstoque)}</TableCell>
-                          <TableCell>
-                            <Chip
-                              label={produto.ativo ? 'Ativo' : 'Inativo'}
-                              color={produto.ativo ? 'success' : 'error'}
-                              size="small"
-                              sx={{ fontWeight: 'medium' }}
-                            />
-                          </TableCell>
-                          <TableCell align="center">
-                            <Button
-                              variant="outlined"
-                              size="small"
-                              onClick={() => handleAbrirDetalhes(produto)}
-                            >
-                              Detalhes
-                            </Button>
-                          </TableCell>
-                        </TableRow>
-                      ))
-                  )}
-                </TableBody>
-              </Table>
-            </TableContainer>
-            {produtosFiltrados.length > 0 && (
-              <TablePagination
-                count={produtosFiltrados.length}
-                page={pagination.page}
-                rowsPerPage={pagination.rowsPerPage}
-                onPageChange={pagination.handleChangePage}
-                onRowsPerPageChange={pagination.handleChangeRowsPerPage}
-              />
-            )}
-          </Box>
-        </>
-      )}
+                  ))
+              )}
+            </TableBody>
+          </Table>
+        </TableContainer>
+        {produtosFiltrados.length > 0 && (
+          <TablePagination
+            count={produtosFiltrados.length}
+            page={pagination.page}
+            rowsPerPage={pagination.rowsPerPage}
+            onPageChange={pagination.handleChangePage}
+            onRowsPerPageChange={pagination.handleChangeRowsPerPage}
+          />
+        )}
+      </Box>
 
       {/* Modal de Detalhes */}
       <ProdutoDetailsModal

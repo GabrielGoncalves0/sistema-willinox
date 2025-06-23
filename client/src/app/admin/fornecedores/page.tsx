@@ -143,9 +143,6 @@ export default function FornecedoresPage() {
         />
       </Box>
 
-      {isLoading ? (
-        <CircularProgress />
-      ) : (
         <FornecedorTable
           fornecedores={fornecedores}
           onEdit={(fornecedor: listarFornecedor | null) => formModal.openForm(fornecedor || undefined)}
@@ -155,7 +152,6 @@ export default function FornecedoresPage() {
           searchTerm={searchTerm}
           showInativos={showInativos}
         />
-      )}
 
       <FornecedorForm
         open={formModal.isOpen}

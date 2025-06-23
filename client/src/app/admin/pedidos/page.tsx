@@ -12,6 +12,7 @@ import {
 } from '@mui/material';
 import { Plus, Search } from 'lucide-react';
 import { PedidoPageHelp } from '@/components/help';
+import CustomizedProgressBars from '@/components/ProgressLoading';
 
 import { usePedido } from '@/hooks/usePedido';
 import { useFormModal } from '@/hooks/common/useFormModal';
@@ -92,7 +93,7 @@ export default function PedidosPage() {
   };
 
   return (
-    <Box>
+    <Box sx={{ p: 3 }}>
 
       <PedidoPageHelp />
 
@@ -100,7 +101,7 @@ export default function PedidosPage() {
         Gerenciamento de Pedidos
       </Typography>
 
-      <Grid container spacing={2} sx={{ mb: 4 }}>
+      <Grid container spacing={2} sx={{ mb: 2 }}>
         <Grid item xs={12} md={6}>
           <TextField
             fullWidth
@@ -127,21 +128,15 @@ export default function PedidosPage() {
         </Grid>
       </Grid>
 
-      {isLoading ? (
-        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
-          <CircularProgress />
-        </Box>
-      ) : (
-        <PedidoTable
-          pedidos={pedidos}
-          onEdit={(pedido?: PedidoDetalhado) => formModal.openForm(pedido)}
-          onDelete={tableActions.openDeleteDialog}
-          onFinalize={handleFinalize}
-          onCancel={handleCancel}
-          isLoading={isLoading}
-          searchTerm={searchTerm}
-        />
-      )}
+      <PedidoTable
+        pedidos={pedidos}
+        onEdit={(pedido?: PedidoDetalhado) => formModal.openForm(pedido)}
+        onDelete={tableActions.openDeleteDialog}
+        onFinalize={handleFinalize}
+        onCancel={handleCancel}
+        isLoading={isLoading}
+        searchTerm={searchTerm}
+      />
 
       <PedidoForm
         open={formModal.isOpen}

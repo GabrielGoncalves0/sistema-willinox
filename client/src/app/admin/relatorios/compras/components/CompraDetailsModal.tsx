@@ -17,7 +17,7 @@ import {
   ListItem,
   ListItemText,
 } from '@mui/material';
-import { X, FileText, Printer } from 'lucide-react';
+import { Printer } from 'lucide-react';
 import { Compra } from '../schema';
 import { FormatDate } from '@/utils/formatDate';
 

@@ -26,6 +26,7 @@ import { FormatNumber } from '../../../../utils/formatNumber';
 import { FormatDate } from '../../../../utils/formatDate';
 import { useFornecedor } from '../../../../hooks/useFornecedor';
 import { TablePagination } from '@/components/TablePagination';
+import CustomizedProgressBars from '@/components/ProgressLoading';
 
 
 interface CompraTableProps {
@@ -105,10 +106,6 @@ export default function CompraTable({
            compra.compra.status === CompraStatus.PROCESSANDO;
   }, []);
 
-  if (isLoading) {
-    return <Typography>Carregando compras...</Typography>;
-  }
-
   return (
     <Box>
       <TableContainer component={Paper} sx={{ borderRadius: '8px 8px 0 0' }}>
@@ -124,130 +121,136 @@ export default function CompraTable({
             </TableRow>
           </TableHead>
           <TableBody>
-            {paginatedCompras.length > 0 ? (
-              paginatedCompras.map((item) => (
-                <TableRow key={item.compra.id}>
-                  <TableCell>{item.compra.id}</TableCell>
-                  <TableCell>{FormatDate.date(item.compra.data)}</TableCell>
-                  <TableCell>{getFornecedorNome(item.compra.juridicaId)}</TableCell>
-                  <TableCell align="right">{FormatNumber.currency(item.compra.valorTotal)}</TableCell>
-                  <TableCell align="center">
-                    <Chip
-                      label={getStatusText(item.compra.status)}
-                      sx={{
-                        bgcolor: getStatusColor(item.compra.status),
-                        color: 'white',
-                        fontWeight: 'bold'
-                      }}
-                    />
-                  </TableCell>
-                  <TableCell align="center">
-                    <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-                      <Tooltip title="Ver Detalhes">
-                        <IconButton
-                          color="info"
-                          onClick={() => onViewDetails(item)}
-                        >
-                          <VisibilityIcon />
-                        </IconButton>
-                      </Tooltip>
-
-                      <Tooltip title={
-                        item.compra.status === CompraStatus.CONCLUIDO || item.compra.status === CompraStatus.CANCELADO
-                          ? "Compra concluída ou cancelada não pode ser editada"
-                          : "Editar"
-                      }>
-                        <span style={{
-                          opacity: item.compra.status === CompraStatus.CONCLUIDO || item.compra.status === CompraStatus.CANCELADO
-                            ? 0.5
-                            : 1
-                        }}>
-                          <IconButton
-                            color="primary"
-                            onClick={() => onEdit(item)}
-                            disabled={
-                              item.compra.status === CompraStatus.CONCLUIDO ||
-                              item.compra.status === CompraStatus.CANCELADO
-                            }
-                          >
-                            <EditIcon />
-                          </IconButton>
-                        </span>
-                      </Tooltip>
-
-                      <Tooltip title="Excluir">
-                        <span style={{
-                          opacity: item.compra.status === CompraStatus.CONCLUIDO || item.compra.status === CompraStatus.CANCELADO
-                            ? 0.5
-                            : 1
-                        }}>
-                          <IconButton
-                            color="error"
-                            onClick={() => onDelete(item)}
-                            disabled={
-                              item.compra.status === CompraStatus.CONCLUIDO ||
-                              item.compra.status === CompraStatus.CANCELADO
-                            }
-                          >
-                            <DeleteIcon />
-                          </IconButton>
-                        </span>
-                      </Tooltip>
-
-                      <Tooltip title="Finalizar Compra">
-                        <span style={{ opacity: !isCompraFinalizavel(item) ? 0.5 : 1 }}>
-                          <IconButton
-                            color="success"
-                            onClick={() => onFinalize(item)}
-                            disabled={
-                              item.compra.status === CompraStatus.CONCLUIDO ||
-                              item.compra.status === CompraStatus.CANCELADO
-                            }
-                          >
-                            <CheckCircleIcon />
-                          </IconButton>
-                        </span>
-                      </Tooltip>
-
-                      <Tooltip title="Cancelar Compra">
-                        <span style={{ opacity: !isCompraCancelavel(item) ? 0.5 : 1 }}>
-                          <IconButton
-                            color="warning"
-                            onClick={() => onCancel(item)}
-                            disabled={
-                              item.compra.status === CompraStatus.CONCLUIDO ||
-                              item.compra.status === CompraStatus.CANCELADO
-                            }
-                          >
-                            <CancelIcon />
-                          </IconButton>
-                        </span>
-                      </Tooltip>
-                    </Box>
-                  </TableCell>
-                </TableRow>
-              ))
-            ) : (
+            {isLoading ? (
               <TableRow>
-                <TableCell colSpan={7}>
-                  <Typography align="center" sx={{ py: 2 }}>
-                    Nenhuma compra encontrada.
-                  </Typography>
+                <TableCell colSpan={7} align="center">
+                  <CustomizedProgressBars />
                 </TableCell>
               </TableRow>
+            ) : (
+              paginatedCompras.length > 0 ? (
+                paginatedCompras.map((item) => (
+                  <TableRow key={item.compra.id}>
+                    <TableCell>{item.compra.id}</TableCell>
+                    <TableCell>{FormatDate.date(item.compra.data)}</TableCell>
+                    <TableCell>{getFornecedorNome(item.compra.juridicaId)}</TableCell>
+                    <TableCell align="right">{FormatNumber.currency(item.compra.valorTotal)}</TableCell>
+                    <TableCell align="center">
+                      <Chip
+                        label={getStatusText(item.compra.status)}
+                        sx={{
+                          bgcolor: getStatusColor(item.compra.status),
+                          color: 'white',
+                          fontWeight: 'bold'
+                        }}
+                      />
+                    </TableCell>
+                    <TableCell align="center">
+                      <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                        <Tooltip title="Ver Detalhes">
+                          <IconButton
+                            color="info"
+                            onClick={() => onViewDetails(item)}
+                          >
+                            <VisibilityIcon />
+                          </IconButton>
+                        </Tooltip>
+
+                        <Tooltip title={
+                          item.compra.status === CompraStatus.CONCLUIDO || item.compra.status === CompraStatus.CANCELADO
+                            ? "Compra concluída ou cancelada não pode ser editada"
+                            : "Editar"
+                        }>
+                          <span style={{
+                            opacity: item.compra.status === CompraStatus.CONCLUIDO || item.compra.status === CompraStatus.CANCELADO
+                              ? 0.5
+                              : 1
+                          }}>
+                            <IconButton
+                              color="primary"
+                              onClick={() => onEdit(item)}
+                              disabled={
+                                item.compra.status === CompraStatus.CONCLUIDO ||
+                                item.compra.status === CompraStatus.CANCELADO
+                              }
+                            >
+                              <EditIcon />
+                            </IconButton>
+                          </span>
+                        </Tooltip>
+
+                        <Tooltip title="Excluir">
+                          <span style={{
+                            opacity: item.compra.status === CompraStatus.CONCLUIDO || item.compra.status === CompraStatus.CANCELADO
+                              ? 0.5
+                              : 1
+                          }}>
+                            <IconButton
+                              color="error"
+                              onClick={() => onDelete(item)}
+                              disabled={
+                                item.compra.status === CompraStatus.CONCLUIDO ||
+                                item.compra.status === CompraStatus.CANCELADO
+                              }
+                            >
+                              <DeleteIcon />
+                            </IconButton>
+                          </span>
+                        </Tooltip>
+
+                        <Tooltip title="Finalizar Compra">
+                          <span style={{ opacity: !isCompraFinalizavel(item) ? 0.5 : 1 }}>
+                            <IconButton
+                              color="success"
+                              onClick={() => onFinalize(item)}
+                              disabled={
+                                item.compra.status === CompraStatus.CONCLUIDO ||
+                                item.compra.status === CompraStatus.CANCELADO
+                              }
+                            >
+                              <CheckCircleIcon />
+                            </IconButton>
+                          </span>
+                        </Tooltip>
+
+                        <Tooltip title="Cancelar Compra">
+                          <span style={{ opacity: !isCompraCancelavel(item) ? 0.5 : 1 }}>
+                            <IconButton
+                              color="warning"
+                              onClick={() => onCancel(item)}
+                              disabled={
+                                item.compra.status === CompraStatus.CONCLUIDO ||
+                                item.compra.status === CompraStatus.CANCELADO
+                              }
+                            >
+                              <CancelIcon />
+                            </IconButton>
+                          </span>
+                        </Tooltip>
+                      </Box>
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={7}>
+                    <Typography align="center" sx={{ py: 2 }}>
+                      Nenhuma compra encontrada.
+                    </Typography>
+                  </TableCell>
+                </TableRow>
+              )
             )}
           </TableBody>
         </Table>
       </TableContainer>
-      {filteredCompras.length > 0 && (
-        <TablePagination
-          count={filteredCompras.length}
-          page={page}
-          rowsPerPage={rowsPerPage}
-          onPageChange={handleChangePage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-        />
-      )}
+      <TablePagination
+        count={filteredCompras.length}
+        page={page}
+        rowsPerPage={rowsPerPage}
+        onPageChange={handleChangePage}
+        onRowsPerPageChange={handleChangeRowsPerPage}
+      />
     </Box>
   );
 }

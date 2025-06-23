@@ -158,9 +158,8 @@ export default function DashboardLayout({
         msOverflowStyle: 'none'
       }}
     >
-      <Box sx={{ p: 3, display: 'flex', alignItems: 'center', gap: 2 }}>
-        <LayoutDashboard size={32} color={theme.palette.primary.main} />
-        <Typography variant="h6" color="text.primary" sx={{ fontWeight: 600 }}>
+      <Box sx={{ p: 3, display: 'flex', alignItems: 'center', justifyContent: "center", gap: 2 }}>
+        <Typography variant="h4" color="text.primary" sx={{ fontWeight: 600 }}>
           WILLINOX
         </Typography>
       </Box>

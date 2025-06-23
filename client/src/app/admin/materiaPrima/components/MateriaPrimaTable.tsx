@@ -16,7 +16,7 @@ import { Edit, Delete, Restore } from '@mui/icons-material';
 import { MateriaPrima } from '../constants';
 import { TablePagination } from '@/components/TablePagination';
 import { useState, ChangeEvent } from 'react';
-
+import CustomizedProgressBars from '@/components/ProgressLoading';
 
 interface MateriaPrimaTableProps {
   materials: MateriaPrima[];
@@ -71,10 +71,6 @@ export const MateriaPrimaTable = ({
     setPage(0);
   };
 
-  if (isLoading) {
-    return <Typography>Carregando matérias-primas...</Typography>;
-  }
-
   return (
     <Box>
       <TableContainer component={Paper} sx={{ borderRadius: '8px 8px 0 0' }}>
@@ -91,59 +87,67 @@ export const MateriaPrimaTable = ({
           </TableRow>
         </TableHead>
         <TableBody>
-          {paginatedMaterials.length > 0 ? (
-            paginatedMaterials.map((material) => (
-              <TableRow
-                key={material.id}
-                sx={!material.ativo ? { backgroundColor: 'rgba(0, 0, 0, 0.04)' } : {}}
-              >
-                <TableCell>{material.codigo}</TableCell>
-                <TableCell>
-                  {material.nome}
-                  {!material.ativo && (
-                    <Typography variant="caption" color="text.secondary" sx={{ ml: 1, fontStyle: 'italic' }}>
-                      (Inativo)
-                    </Typography>
-                  )}
-                </TableCell>
-                <TableCell>{material.descricao}</TableCell>
-                <TableCell align="left">{material.qtdEstoque}</TableCell>
-                <TableCell>{material.unidadeMedida}</TableCell>
-                <TableCell align="left">{formatPrice(material.preco)}</TableCell>
-                <TableCell align="center">
-                  <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-                    <IconButton
-                      color="primary"
-                      onClick={() => onEdit(material)}
-                    >
-                      <Edit />
-                    </IconButton>
-                    {material.ativo ? (
-                      <IconButton
-                        color="error"
-                        onClick={() => onDelete(material)}
-                      >
-                        <Delete />
-                      </IconButton>
-                    ) : (
-                      <IconButton
-                        color="success"
-                        onClick={() => onRestore && onRestore(material)}
-                        disabled={!onRestore}
-                      >
-                        <Restore />
-                      </IconButton>
-                    )}
-                  </Box>
-                </TableCell>
-              </TableRow>
-            ))
-          ) : (
+          {isLoading ? (
             <TableRow>
               <TableCell colSpan={7} align="center">
-                Nenhuma matéria-prima encontrada
+                <CustomizedProgressBars />
               </TableCell>
             </TableRow>
+          ) : (
+            paginatedMaterials.length > 0 ? (
+              paginatedMaterials.map((material) => (
+                <TableRow
+                  key={material.id}
+                  sx={!material.ativo ? { backgroundColor: 'rgba(0, 0, 0, 0.04)' } : {}}
+                >
+                  <TableCell>{material.codigo}</TableCell>
+                  <TableCell>
+                    {material.nome}
+                    {!material.ativo && (
+                      <Typography variant="caption" color="text.secondary" sx={{ ml: 1, fontStyle: 'italic' }}>
+                        (Inativo)
+                      </Typography>
+                    )}
+                  </TableCell>
+                  <TableCell>{material.descricao}</TableCell>
+                  <TableCell align="left">{material.qtdEstoque}</TableCell>
+                  <TableCell>{material.unidadeMedida}</TableCell>
+                  <TableCell align="left">{formatPrice(material.preco)}</TableCell>
+                  <TableCell align="center">
+                    <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                      <IconButton
+                        color="primary"
+                        onClick={() => onEdit(material)}
+                      >
+                        <Edit />
+                      </IconButton>
+                      {material.ativo ? (
+                        <IconButton
+                          color="error"
+                          onClick={() => onDelete(material)}
+                        >
+                          <Delete />
+                        </IconButton>
+                      ) : (
+                        <IconButton
+                          color="success"
+                          onClick={() => onRestore && onRestore(material)}
+                          disabled={!onRestore}
+                        >
+                          <Restore />
+                        </IconButton>
+                      )}
+                    </Box>
+                  </TableCell>
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={7} align="center">
+                  Nenhuma matéria-prima encontrada
+                </TableCell>
+              </TableRow>
+            )
           )}
         </TableBody>
       </Table>

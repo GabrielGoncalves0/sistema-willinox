@@ -25,6 +25,7 @@ import { FormatDate } from '@/utils/formatDate';
 import { useCliente } from '@/hooks/useCliente';
 import { usePedido } from '@/hooks/usePedido';
 import { TablePagination } from '@/components/TablePagination';
+import CustomizedProgressBars from '@/components/ProgressLoading';
 
 
 interface PedidoTableProps {
@@ -86,14 +87,6 @@ export default function PedidoTable({
     page * rowsPerPage + rowsPerPage
   );
 
-  if (isLoading) {
-    return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}>
-        <Typography>Carregando pedidos...</Typography>
-      </Box>
-    );
-  }
-
   return (
     <Box>
       <TableContainer component={Paper} sx={{ borderRadius: '8px 8px 0 0' }}>
@@ -110,134 +103,140 @@ export default function PedidoTable({
             </TableRow>
           </TableHead>
           <TableBody>
-            {paginatedPedidos.length > 0 ? (
-              paginatedPedidos.map((pedido) => (
-                <TableRow key={pedido.pedido.id}>
-                  <TableCell>{pedido.pedido.id}</TableCell>
-                  <TableCell>{FormatDate.date(pedido.pedido.data)}</TableCell>
-                  <TableCell>{getClienteNome(pedido.pedido.pessoaId)}</TableCell>
-                  <TableCell>
-                    <Chip
-                      label={getStatusText(pedido.pedido.status)}
-                      sx={{
-                        bgcolor: getStatusColor(pedido.pedido.status),
-                        color: 'white',
-                        fontWeight: 'bold'
-                      }}
-                      size="small"
-                    />
-                  </TableCell>
-                  <TableCell>
-                    {FormatNumber.currency(pedido.pedido.valorEntrada || 0)}
-                  </TableCell>
-                  <TableCell>
-                    {(() => {
-                      try {
-
-                        const valorTotal = calcularValorTotal(pedido);
-                        return FormatNumber.currency(valorTotal);
-                      } catch (error) {
-                        console.error(`Erro ao calcular valor total do pedido ${pedido.pedido.id}:`, error);
-                        return FormatNumber.currency(0);
-                      }
-                    })()}
-                  </TableCell>
-                  <TableCell align="center">
-                    <Tooltip title={
-                      pedido.pedido.status === PedidoStatus.CONCLUIDO || pedido.pedido.status === PedidoStatus.CANCELADO
-                        ? "Pedido concluído ou cancelado não pode ser editado"
-                        : "Editar"
-                    }>
-                      <span style={{
-                        opacity: pedido.pedido.status === PedidoStatus.CONCLUIDO || pedido.pedido.status === PedidoStatus.CANCELADO
-                          ? 0.5
-                          : 1
-                      }}>
-                        <IconButton
-                          onClick={() => onEdit(pedido)}
-                          color="primary"
-                          disabled={
-                            pedido.pedido.status === PedidoStatus.CONCLUIDO ||
-                            pedido.pedido.status === PedidoStatus.CANCELADO
-                          }
-                        >
-                          <EditIcon />
-                        </IconButton>
-                      </span>
-                    </Tooltip>
-
-                    <Tooltip title="Excluir">
-                      <span style={{
-                        opacity: pedido.pedido.status === PedidoStatus.CONCLUIDO || pedido.pedido.status === PedidoStatus.CANCELADO
-                          ? 0.5
-                          : 1
-                      }}>
-                        <IconButton
-                          onClick={() => onDelete(pedido)}
-                          color="error"
-                          disabled={
-                            pedido.pedido.status === PedidoStatus.CONCLUIDO ||
-                            pedido.pedido.status === PedidoStatus.CANCELADO
-                          }
-                        >
-                          <DeleteIcon />
-                        </IconButton>
-                      </span>
-                    </Tooltip>
-
-                    <Tooltip title="Finalizar">
-                      <span style={{ opacity: pedido.pedido.status === PedidoStatus.CONCLUIDO || pedido.pedido.status === PedidoStatus.CANCELADO ? 0.5 : 1 }}>
-                        <IconButton
-                          onClick={() => onFinalize(pedido)}
-                          disabled={
-                            pedido.pedido.status === PedidoStatus.CONCLUIDO ||
-                            pedido.pedido.status === PedidoStatus.CANCELADO
-                          }
-                          color="success"
-                        >
-                          <CheckCircleIcon />
-                        </IconButton>
-                      </span>
-                    </Tooltip>
-
-                    <Tooltip title="Cancelar">
-                      <span style={{ opacity: pedido.pedido.status === PedidoStatus.CONCLUIDO || pedido.pedido.status === PedidoStatus.CANCELADO ? 0.5 : 1 }}>
-                        <IconButton
-                          onClick={() => onCancel(pedido)}
-                          disabled={
-                            pedido.pedido.status === PedidoStatus.CONCLUIDO ||
-                            pedido.pedido.status === PedidoStatus.CANCELADO
-                          }
-                          color="warning"
-                        >
-                          <CancelIcon />
-                        </IconButton>
-                      </span>
-                    </Tooltip>
-                  </TableCell>
-                </TableRow>
-              ))
-            ) : (
+            {isLoading ? (
               <TableRow>
                 <TableCell colSpan={7} align="center">
-                  <Typography variant="body1" sx={{ py: 2 }}>
-                    {searchTerm ? 'Nenhum pedido encontrado para a pesquisa.' : 'Nenhum pedido cadastrado.'}
-                  </Typography>
+                  <CustomizedProgressBars />
                 </TableCell>
               </TableRow>
+            ) : (
+              paginatedPedidos.length > 0 ? (
+                paginatedPedidos.map((pedido) => (
+                  <TableRow key={pedido.pedido.id}>
+                    <TableCell>{pedido.pedido.id}</TableCell>
+                    <TableCell>{FormatDate.date(pedido.pedido.data)}</TableCell>
+                    <TableCell>{getClienteNome(pedido.pedido.pessoaId)}</TableCell>
+                    <TableCell>
+                      <Chip
+                        label={getStatusText(pedido.pedido.status)}
+                        sx={{
+                          bgcolor: getStatusColor(pedido.pedido.status),
+                          color: 'white',
+                          fontWeight: 'bold'
+                        }}
+                        size="small"
+                      />
+                    </TableCell>
+                    <TableCell>
+                      {FormatNumber.currency(pedido.pedido.valorEntrada || 0)}
+                    </TableCell>
+                    <TableCell>
+                      {(() => {
+                        try {
+
+                          const valorTotal = calcularValorTotal(pedido);
+                          return FormatNumber.currency(valorTotal);
+                        } catch (error) {
+                          console.error(`Erro ao calcular valor total do pedido ${pedido.pedido.id}:`, error);
+                          return FormatNumber.currency(0);
+                        }
+                      })()}
+                    </TableCell>
+                    <TableCell align="center">
+                      <Tooltip title={
+                        pedido.pedido.status === PedidoStatus.CONCLUIDO || pedido.pedido.status === PedidoStatus.CANCELADO
+                          ? "Pedido concluído ou cancelado não pode ser editado"
+                          : "Editar"
+                      }>
+                        <span style={{
+                          opacity: pedido.pedido.status === PedidoStatus.CONCLUIDO || pedido.pedido.status === PedidoStatus.CANCELADO
+                            ? 0.5
+                            : 1
+                        }}>
+                          <IconButton
+                            onClick={() => onEdit(pedido)}
+                            color="primary"
+                            disabled={
+                              pedido.pedido.status === PedidoStatus.CONCLUIDO ||
+                              pedido.pedido.status === PedidoStatus.CANCELADO
+                            }
+                          >
+                            <EditIcon />
+                          </IconButton>
+                        </span>
+                      </Tooltip>
+
+                      <Tooltip title="Excluir">
+                        <span style={{
+                          opacity: pedido.pedido.status === PedidoStatus.CONCLUIDO || pedido.pedido.status === PedidoStatus.CANCELADO
+                            ? 0.5
+                            : 1
+                        }}>
+                          <IconButton
+                            onClick={() => onDelete(pedido)}
+                            color="error"
+                            disabled={
+                              pedido.pedido.status === PedidoStatus.CONCLUIDO ||
+                              pedido.pedido.status === PedidoStatus.CANCELADO
+                            }
+                          >
+                            <DeleteIcon />
+                          </IconButton>
+                        </span>
+                      </Tooltip>
+
+                      <Tooltip title="Finalizar">
+                        <span style={{ opacity: pedido.pedido.status === PedidoStatus.CONCLUIDO || pedido.pedido.status === PedidoStatus.CANCELADO ? 0.5 : 1 }}>
+                          <IconButton
+                            onClick={() => onFinalize(pedido)}
+                            disabled={
+                              pedido.pedido.status === PedidoStatus.CONCLUIDO ||
+                              pedido.pedido.status === PedidoStatus.CANCELADO
+                            }
+                            color="success"
+                          >
+                            <CheckCircleIcon />
+                          </IconButton>
+                        </span>
+                      </Tooltip>
+
+                      <Tooltip title="Cancelar">
+                        <span style={{ opacity: pedido.pedido.status === PedidoStatus.CONCLUIDO || pedido.pedido.status === PedidoStatus.CANCELADO ? 0.5 : 1 }}>
+                          <IconButton
+                            onClick={() => onCancel(pedido)}
+                            disabled={
+                              pedido.pedido.status === PedidoStatus.CONCLUIDO ||
+                              pedido.pedido.status === PedidoStatus.CANCELADO
+                            }
+                            color="warning"
+                          >
+                            <CancelIcon />
+                          </IconButton>
+                        </span>
+                      </Tooltip>
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={7} align="center">
+                    <Typography variant="body1" sx={{ py: 2 }}>
+                      {searchTerm ? 'Nenhum pedido encontrado para a pesquisa.' : 'Nenhum pedido cadastrado.'}
+                    </Typography>
+                  </TableCell>
+                </TableRow>
+              )
             )}
           </TableBody>
         </Table>
       </TableContainer>
-      {filteredPedidos.length > 0 && (
-        <TablePagination
-          count={filteredPedidos.length}
-          page={page}
-          rowsPerPage={rowsPerPage}
-          onPageChange={handleChangePage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-        />
-      )}
+      <TablePagination
+        count={filteredPedidos.length}
+        page={page}
+        rowsPerPage={rowsPerPage}
+        onPageChange={handleChangePage}
+        onRowsPerPageChange={handleChangeRowsPerPage}
+      />
     </Box>
   );
 }

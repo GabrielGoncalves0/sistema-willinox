@@ -145,19 +145,15 @@ export default function ClientesPage() {
         />
       </Box>
 
-      {isLoading ? (
-        <CircularProgress />
-      ) : (
-        <ClienteTable
-          clientes={clientes}
-          onEdit={(cliente: listarCliente | null) => formModal.openForm(cliente || undefined)}
-          onDelete={tableActions.openDeleteDialog}
-          onRestore={tableActions.handleRestore!}
-          isLoading={isLoading}
-          searchTerm={searchTerm}
-          showInativos={showInativos}
-        />
-      )}
+      <ClienteTable
+        clientes={clientes}
+        onEdit={(cliente: listarCliente | null) => formModal.openForm(cliente || undefined)}
+        onDelete={tableActions.openDeleteDialog}
+        onRestore={tableActions.handleRestore!}
+        isLoading={isLoading}
+        searchTerm={searchTerm}
+        showInativos={showInativos}
+      />
 
       <ClienteForm
         open={formModal.isOpen}
