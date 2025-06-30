@@ -20,6 +20,8 @@ import {
 import { Printer } from 'lucide-react';
 import { Compra } from '../schema';
 import { FormatDate } from '@/utils/formatDate';
+import { pdf } from '@react-pdf/renderer';
+import CompraPDFDocument from './CompraPDFDocument';
 
 interface CompraDetailsModalProps {
   open: boolean;
@@ -60,99 +62,17 @@ export default function CompraDetailsModal({ open, onClose, compra }: CompraDeta
     }
   };
 
-  const handleImprimir = () => {
-    const printWindow = window.open('', '_blank');
-    if (!printWindow) return;
-
-    const printContent = `
-      <!DOCTYPE html>
-      <html>
-        <head>
-          <title>Detalhes da Compra ${compra.codigo}</title>
-          <style>
-            body { font-family: Arial, sans-serif; margin: 20px; color: #333; }
-            .header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid #333; padding-bottom: 10px; }
-            .header h1 { margin: 0; color: #1976d2; }
-            .info-section { margin-bottom: 25px; padding: 15px; background-color: #f9f9f9; border-radius: 5px; }
-            .info-section h3 { margin-top: 0; color: #1976d2; border-bottom: 1px solid #ddd; padding-bottom: 5px; }
-            .info-row { display: flex; margin-bottom: 8px; }
-            .info-label { font-weight: bold; min-width: 150px; }
-            table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-            th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-            th { background-color: #1976d2; color: white; font-weight: bold; }
-            tr:nth-child(even) { background-color: #f9f9f9; }
-            .text-right { text-align: right; }
-            .status-chip { padding: 4px 8px; border-radius: 12px; font-size: 12px; font-weight: bold; color: white; }
-            .status-pendente { background-color: #ff9800; }
-            .status-processando { background-color: #2196f3; }
-            .status-concluido { background-color: #4caf50; }
-            .status-cancelado { background-color: #f44336; }
-          </style>
-        </head>
-        <body>
-          <div class="header">
-            <h1>Detalhes da Compra: ${compra.codigo}</h1>
-            <p>Data de emissão: ${new Date().toLocaleDateString('pt-BR')}</p>
-          </div>
-
-          <div class="info-section">
-            <h3>Informações Gerais</h3>
-            <div class="info-row">
-              <span class="info-label">Código:</span>
-              <span>${compra.codigo}</span>
-            </div>
-            <div class="info-row">
-              <span class="info-label">Data:</span>
-              <span>${formatarData(compra.data)}</span>
-            </div>
-            <div class="info-row">
-              <span class="info-label">Fornecedor:</span>
-              <span>${compra.fornecedor.nome}</span>
-            </div>
-            <div class="info-row">
-              <span class="info-label">Status:</span>
-              <span class="status-chip status-${compra.status.toLowerCase()}">
-                ${getStatusText(compra.status)}
-              </span>
-            </div>
-          </div>
-
-          <div class="info-section">
-            <h3>Itens da Compra</h3>
-            <table>
-              <thead>
-                <tr>
-                  <th>Matéria Prima</th>
-                  <th class="text-right">Quantidade</th>
-                  <th class="text-right">Valor Unitário</th>
-                  <th class="text-right">Valor Total</th>
-                </tr>
-              </thead>
-              <tbody>
-                ${compra.itens.map(item => `
-                  <tr>
-                    <td>${item.materiaPrima.nome}</td>
-                    <td class="text-right">${item.quantidade}</td>
-                    <td class="text-right">${formatarValor(item.valorUnitario)}</td>
-                    <td class="text-right">${formatarValor(item.valorTotal)}</td>
-                  </tr>
-                `).join('')}
-                <tr style="background-color: #e3f2fd; font-weight: bold;">
-                  <td colspan="3" class="text-right">Total da Compra:</td>
-                  <td class="text-right">${formatarValor(compra.valorTotal)}</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </body>
-      </html>
-    `;
-
-    printWindow.document.write(printContent);
-    printWindow.document.close();
-    printWindow.focus();
-    printWindow.print();
-    printWindow.close();
+  const handleImprimir = async () => {
+    if (!compra) return;
+    const blob = await pdf(<CompraPDFDocument compra={compra} />).toBlob();
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `compra_${compra.codigo}.pdf`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   };
 
   return (

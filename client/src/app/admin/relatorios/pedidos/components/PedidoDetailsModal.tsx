@@ -20,6 +20,8 @@ import {
 import { Printer } from 'lucide-react';
 import { PedidoReport } from '../schema';
 import { format } from 'date-fns';
+import { pdf } from '@react-pdf/renderer';
+import PedidoPDFDocument from './PedidoPDFDocument';
 
 interface PedidoDetailsModalProps {
   open: boolean;
@@ -46,158 +48,35 @@ export default function PedidoDetailsModal({ open, onClose, pedido }: PedidoDeta
 
   const getStatusText = (status: string) => {
     switch (status) {
-      case 'PENDENTE': return 'Pendente';
-      case 'PROCESSADO': return 'Processando';
-      case 'CONCLUIDO': return 'Concluído';
-      case 'CANCELADO': return 'Cancelado';
-      default: return status;
+      case 'pendente': return 'Pendente';
+      case 'processando': return 'Processando';
+      case 'concluido': return 'Concluído';
+      case 'cancelado': return 'Cancelado';
+      default: return 'Desconhecido';
     }
   };
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'PENDENTE': return '#ff9800';
-      case 'PROCESSADO': return '#2196f3';
-      case 'CONCLUIDO': return '#4caf50';
-      case 'CANCELADO': return '#f44336';
-      default: return '#757575';
+      case 'pendente': return 'warning.main';
+      case 'processando': return 'info.main';
+      case 'concluido': return 'success.main';
+      case 'cancelado': return 'error.main';
+      default: return 'default';
     }
   };
 
-  const handleImprimir = () => {
-    const printWindow = window.open('', '_blank');
-    if (!printWindow) return;
-
-    const printContent = `
-      <!DOCTYPE html>
-      <html>
-        <head>
-          <title>Detalhes do Pedido ${pedido.id}</title>
-          <style>
-            body { font-family: Arial, sans-serif; margin: 20px; color: #333; }
-            .header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid #333; padding-bottom: 10px; }
-            .header h1 { margin: 0; color: #1976d2; }
-            .info-section { margin-bottom: 25px; padding: 15px; background-color: #f9f9f9; border-radius: 5px; }
-            .info-section h3 { margin-top: 0; color: #1976d2; border-bottom: 1px solid #ddd; padding-bottom: 5px; }
-            .info-row { display: flex; margin-bottom: 8px; }
-            .info-label { font-weight: bold; min-width: 150px; }
-            .status-chip { padding: 4px 8px; border-radius: 12px; font-size: 12px; font-weight: bold; color: white; }
-            .status-pendente { background-color: #ff9800; }
-            .status-processado { background-color: #2196f3; }
-            .status-concluido { background-color: #4caf50; }
-            .status-cancelado { background-color: #f44336; }
-            table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-            th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-            th { background-color: #1976d2; color: white; font-weight: bold; }
-            tr:nth-child(even) { background-color: #f9f9f9; }
-            .text-right { text-align: right; }
-            .text-center { text-align: center; }
-          </style>
-        </head>
-        <body>
-          <div class="header">
-            <h1>Detalhes do Pedido: ${pedido.id}</h1>
-            <p>Data de emissão: ${format(new Date(), 'dd/MM/yyyy HH:mm')}</p>
-          </div>
-
-          <div class="info-section">
-            <h3>Informações Gerais</h3>
-            <div class="info-row">
-              <span class="info-label">ID:</span>
-              <span>${pedido.id}</span>
-            </div>
-            <div class="info-row">
-              <span class="info-label">Cliente:</span>
-              <span>${pedido.cliente.nome}</span>
-            </div>
-            <div class="info-row">
-              <span class="info-label">Data:</span>
-              <span>${formatarData(pedido.dataInicio)}</span>
-            </div>
-            <div class="info-row">
-              <span class="info-label">Status:</span>
-              <span class="status-chip status-${pedido.status.toLowerCase()}">
-                ${getStatusText(pedido.status)}
-              </span>
-            </div>
-            <div class="info-row">
-              <span class="info-label">Valor de Entrada:</span>
-              <span>${formatarValor(pedido.valorEntrada)}</span>
-            </div>
-          </div>
-
-          ${pedido.produtos && pedido.produtos.length > 0 ? `
-            <div class="info-section">
-              <h3>Produtos</h3>
-              <table>
-                <thead>
-                  <tr>
-                    <th>Produto</th>
-                    <th class="text-center">Quantidade</th>
-                    <th class="text-right">Preço Unit.</th>
-                    <th class="text-right">Subtotal</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  ${pedido.produtos.map(item => `
-                    <tr>
-                      <td>${item.produto?.nome || `Produto ${item.produtoId}`}</td>
-                      <td class="text-center">${item.quantidade}</td>
-                      <td class="text-right">${formatarValor(item.preco)}</td>
-                      <td class="text-right">${formatarValor(item.quantidade * item.preco)}</td>
-                    </tr>
-                  `).join('')}
-                  <tr style="background-color: #e3f2fd; font-weight: bold;">
-                    <td colspan="3" class="text-right">Total Produtos:</td>
-                    <td class="text-right">${formatarValor(
-                      pedido.produtos.reduce((sum, item) => sum + item.quantidade * item.preco, 0)
-                    )}</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          ` : ''}
-
-          ${pedido.materiasPrimas && pedido.materiasPrimas.length > 0 ? `
-            <div class="info-section">
-              <h3>Matérias-primas</h3>
-              <table>
-                <thead>
-                  <tr>
-                    <th>Matéria-prima</th>
-                    <th class="text-center">Quantidade</th>
-                    <th class="text-right">Preço Unit.</th>
-                    <th class="text-right">Subtotal</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  ${pedido.materiasPrimas.map(item => `
-                    <tr>
-                      <td>${item.materiaPrima?.nome || `Matéria-prima ${item.materiaPrimaId}`}</td>
-                      <td class="text-center">${item.quantidade}</td>
-                      <td class="text-right">${formatarValor(item.preco)}</td>
-                      <td class="text-right">${formatarValor(item.quantidade * item.preco)}</td>
-                    </tr>
-                  `).join('')}
-                  <tr style="background-color: #e8f5e8; font-weight: bold;">
-                    <td colspan="3" class="text-right">Total Matérias-primas:</td>
-                    <td class="text-right">${formatarValor(
-                      pedido.materiasPrimas.reduce((sum, item) => sum + item.quantidade * item.preco, 0)
-                    )}</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          ` : ''}
-        </body>
-      </html>
-    `;
-
-    printWindow.document.write(printContent);
-    printWindow.document.close();
-    printWindow.focus();
-    printWindow.print();
-    printWindow.close();
+  const handleImprimir = async () => {
+    if (!pedido) return;
+    const blob = await pdf(<PedidoPDFDocument pedido={pedido} />).toBlob();
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `pedido_${pedido.id}.pdf`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   };
 
   return (
