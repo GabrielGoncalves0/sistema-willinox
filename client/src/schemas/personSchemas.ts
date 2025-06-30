@@ -5,9 +5,13 @@ export const clienteSchemaFisico = Yup.object().shape({
   nome: commonFields.nome,
   endereco: commonFields.endereco,
   telefone: commonFields.telefone,
-  email: commonFields.email,
+  email: Yup.string()
+    .matches(
+      /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+      'Email inválido. Exemplo: email@dominio.com'
+    ),
   cpf: commonFields.cpf,
-  dataNascimento: commonFields.dataNascimento,
+  dataNascimento: Yup.string(),
   tipo: Yup.string().oneOf(['fisica']).required(),
   fisicaTipo: Yup.string().oneOf(['cliente']).required(),
 });

@@ -6,7 +6,7 @@ export interface CreateCliente {
     nome: string;
     endereco: string;
     telefone: string;
-    email: string;
+    email?: string;
     tipo: 'fisica' | 'juridica';
     fisicaTipo?: 'cliente';
     juridicaTipo?: 'cliente';

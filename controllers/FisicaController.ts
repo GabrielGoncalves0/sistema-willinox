@@ -26,6 +26,7 @@ export default class FisicaController {
             res.status(500).json({ msg: ex.message });
         }
     }
+
     async listarFuncionarios(req: Request, res: Response) {
         try {
             const repo = new FisicaRepository();
@@ -75,7 +76,7 @@ export default class FisicaController {
             email = email?.trim();
             cpf = cpf?.trim();
             login = login?.trim();
-            if (!cpf || !dataNascimento || !fisicaTipo || !Object.values(FisicaTipo).includes(fisicaTipo)) {
+            if (!cpf || !fisicaTipo || !Object.values(FisicaTipo).includes(fisicaTipo)) {
                 return res.status(400).json({ msg: "Parâmetros obrigatórios ausentes ou inválidos!" });
             }
             const repoPessoa = new PessoaRepository();

@@ -40,7 +40,6 @@ export const ClienteTable = ({
 }: ClientTableProps) => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
-
   const statusFilteredClients = Array.isArray(clientes)
     ? showInativos
       ? clientes.filter(cliente => !cliente.ativo)
@@ -118,7 +117,7 @@ export const ClienteTable = ({
                     {client.tipo === 'fisica' ? client.cpf : client.cnpj}
                   </TableCell>
                   <TableCell>
-                    {client.tipo === 'fisica'
+                    {client.tipo === 'fisica' && client.dataNascimento
                       ? FormatDate.date(client.dataNascimento)
                       : '-'}
                   </TableCell>

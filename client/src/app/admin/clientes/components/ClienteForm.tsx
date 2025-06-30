@@ -25,8 +25,6 @@ import { FormActions } from '@/components/forms/FormActions';
 
 import { clientSchemaFisico, clientSchemaJuridico, clienteFormInitialValues } from '../schema';
 
-
-
 interface ClientFormProps {
   open: boolean;
   onClose: () => void;
